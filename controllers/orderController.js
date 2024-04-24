@@ -11,6 +11,7 @@ const stripe = new Stripe(
 //placing user order from frontend
 const placeOrder = async (req, res) => {
   const frontend_url = "https://tastyeats-ronak.netlify.app";
+  // const frontend_url = "http://localhost:5173";
   try {
     const newOrder = new orderModel({
       userId: req.body.userId,

@@ -12,7 +12,10 @@ const loginUser = async (req, res) => {
   try {
     const user = await userModel.findOne({ email });
     if (!user) {
-      return res.json({ success: false, message: "User account doesn't exist" });
+      return res.json({
+        success: false,
+        message: "User account doesn't exist",
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -40,7 +43,10 @@ const registerUser = async (req, res) => {
     const exist = await userModel.findOne({ email });
     //checking if user already exists
     if (exist) {
-      return res.json({ success: false, message: "User account already exixts" });
+      return res.json({
+        success: false,
+        message: "User account already exixts",
+      });
     }
 
     //validating email format & strong password
@@ -80,4 +86,16 @@ const registerUser = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser };
+//forgot password
+
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const oldUser = userModel.findOne({ email });
+    if (!oldUser) {
+      res.json({})
+    }
+  } catch (error) {}
+};
+
+export { registerUser, loginUser, forgotPassword };
