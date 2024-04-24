@@ -80,6 +80,7 @@ const registerUser = async (req, res) => {
       token,
       message: `Welcome to Tasty Eat's, ${user.name}`,
       username: user.name,
+      email: email,
     });
   } catch (error) {
     res.json({ success: false, message: "Error" });
@@ -93,7 +94,7 @@ const forgotPassword = async (req, res) => {
   try {
     const oldUser = userModel.findOne({ email });
     if (!oldUser) {
-      res.json({})
+      res.json({});
     }
   } catch (error) {}
 };
