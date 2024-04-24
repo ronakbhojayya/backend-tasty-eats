@@ -2,6 +2,16 @@ import userModel from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import validator from "validator";
+import nodemailer from "nodemailer";
+//app password = 'ueco whuu fmnh aums'
+  // Create a transporter object using SMTP transport
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "ronaktastyeats@gmail.com",
+      pass: "ueco whuu fmnh aums",
+    },
+  });
 const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET);
 };
@@ -75,12 +85,31 @@ const registerUser = async (req, res) => {
     });
     const user = await newUser.save();
     const token = createToken(user._id);
+    //mail
+
+     // Define email options
+     const mailOptions = {
+      from: "ronaktastyeats@gmail.com",
+      to: email,
+      subject: `Hi ${name}, Welcome to Tasty Eat's `,
+      text: `Hi ${name}, Welcome to Tasty Eat's your account is successfully created`,
+    };
+
+    // Send the email
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error occurred:", error);
+      } else {
+        console.log("Email sent successfully:", info.response);
+      }
+    });
+
+    //mailend
     res.json({
       success: true,
       token,
       message: `Welcome to Tasty Eat's, ${user.name}`,
       username: user.name,
-      email: email,
     });
   } catch (error) {
     res.json({ success: false, message: "Error" });
