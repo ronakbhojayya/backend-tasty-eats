@@ -4,14 +4,14 @@ import bcrypt from "bcrypt";
 import validator from "validator";
 import nodemailer from "nodemailer";
 //app password = 'ueco whuu fmnh aums'
-  // Create a transporter object using SMTP transport
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: "ronaktastyeats@gmail.com",
-      pass: "ueco whuu fmnh aums",
-    },
-  });
+// Create a transporter object using SMTP transport
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "ronaktastyeats@gmail.com",
+    pass: "ueco whuu fmnh aums",
+  },
+});
 const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET);
 };
@@ -87,8 +87,8 @@ const registerUser = async (req, res) => {
     const token = createToken(user._id);
     //mail
 
-     // Define email options
-     const mailOptions = {
+    // Define email options
+    const mailOptions = {
       from: "ronaktastyeats@gmail.com",
       to: email,
       subject: `Hi ${name}, Welcome to Tasty Eat's `,
@@ -128,4 +128,37 @@ const forgotPassword = async (req, res) => {
   } catch (error) {}
 };
 
-export { registerUser, loginUser, forgotPassword };
+//change passsword
+
+const changePassword = async (req, res) => {
+  const { email, oldPassword, newPassword, confirmNewPassword } = req.body;
+  try {
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.json({
+        success: false,
+        message: "User account doesn't exist",
+      });
+    }
+      if (newPassword != confirmNewPassword) {
+        return res.json({ success: false, message: "Confirm password must match new password" });
+      }
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.json({ success: false, message: "Incorrect old password" });
+    }
+
+    //password hashing
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await userModel.findOneAndUpdate({email}, { password: hashedPassword });
+    return res.json({ success: true, message: "Password Changed!" });
+
+  } catch (error) {
+    console.log(error);
+    return res.json({ success: false, message: "Errorrrrrrr" });
+  }
+};
+
+export { registerUser, loginUser, forgotPassword, changePassword };
